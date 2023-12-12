@@ -24,10 +24,11 @@ const api = axios.create({
 -----------------------------------------------------------------------*/
 export default function App() {
   const [count, setCount] = useState(10);
+  // 커스텀 훅을 사용, 반환하는 값(상태와 함수)을 구조분해 할당을 통해 다른 컴포넌트에서 사용할 수 있다.
   const { users, getUserInfos, onRemove } = useGetRandomUsers(count);
 
   useEffect(() => {
-    getUserInfos();
+    getUserInfos(count);
   }, []);
 
   return (
@@ -56,7 +57,7 @@ const UserCard = ({ name, email, picture, location, onRemove }) => {
   return (
     <>
       <div className="user-card-container">
-        <img source={picture} alt="user name" />
+        <img source={picture} alt="user image" />
         <p>{name}</p>
         <p>{email}</p>
         <p>{location}</p>
@@ -66,9 +67,9 @@ const UserCard = ({ name, email, picture, location, onRemove }) => {
   );
 };
 /** --------------------------------------------------------------------
- *                                                                     *
+ *               useGetRandomUsers Custom Hooks 생성                     *
 -----------------------------------------------------------------------*/
-const useGetRandomUsers = (count) => {
+export const useGetRandomUsers = (count) => {
   const getUserInfos = async (count) => {
     const [users, setUsers] = useState([]);
     const [showError, setShowError] = useState(false);
@@ -121,77 +122,80 @@ const useGetRandomUsers = (count) => {
       setLoading(false);
     }
   };
+  return { users, getUserInfos, onRemove };
 };
 
 /** --------------------------------------------------------------------
  *                              api 내용                                *
 -----------------------------------------------------------------------*/
-// https://axios-http.com/docs/res_schema
-// https://randomuser.me/api?results=10
-// https://jsonviewer.stack.hu/
-// {
-// results: [
-// {
-// gender: "male",
-// name: {
-// title: "Mr",
-// first: "Phillip",
-// last: "Roberts"
-// },
-// location: {
-// street: {
-// number: 3870,
-// name: "Highfield Road"
-// },
-// city: "Mullingar",
-// state: "Dún Laoghaire–Rathdown",
-// country: "Ireland",
-// postcode: 58889,
-// coordinates: {
-// latitude: "-2.2015",
-// longitude: "-2.6473"
-// },
-// timezone: {
-// offset: "-1:00",
-// description: "Azores, Cape Verde Islands"
-// }
-// },
-// email: "phillip.roberts@example.com",
-// login: {
-// uuid: "cc665a38-815b-4bf4-ab27-8f79e52e8a15",
-// username: "blackkoala563",
-// password: "really",
-// salt: "GhuTR0p3",
-// md5: "c5f263cbb674f875933f697c7992575a",
-// sha1: "ce1a0903304ec32a87c218f270e055de11a7944f",
-// sha256: "2758f9b207af4ea78877df8720377b006bf2facae7ba0f26db91d5fce948161f"
-// },
-// dob: {
-// date: "1998-09-19T20:50:26.641Z",
-// age: 25
-// },
-// registered: {
-// date: "2011-01-21T16:53:27.963Z",
-// age: 12
-// },
-// phone: "071-318-5603",
-// cell: "081-457-7850",
-// id: {
-// name: "PPS",
-// value: "1416302T"
-// },
-// picture: {
-// large: "https://randomuser.me/api/portraits/men/60.jpg",
-// medium: "https://randomuser.me/api/portraits/med/men/60.jpg",
-// thumbnail: "https://randomuser.me/api/portraits/thumb/men/60.jpg"
-// },
-// nat: "IE"
-// }
-// ],
-// info: {
-// seed: "5b767e98f3bc0471",
-// results: 1,
-// page: 1,
-// version: "1.4"
-// }
-// }
+
+/**
+ * https://randomuser.me/api?results=10
+
+{
+results: [
+{
+gender: "male",
+name: {
+title: "Mr",
+first: "Phillip",
+last: "Roberts"
+},
+location: {
+street: {
+number: 3870,
+name: "Highfield Road"
+},
+city: "Mullingar",
+state: "Dún Laoghaire–Rathdown",
+country: "Ireland",
+postcode: 58889,
+coordinates: {
+latitude: "-2.2015",
+longitude: "-2.6473"
+},
+timezone: {
+offset: "-1:00",
+description: "Azores, Cape Verde Islands"
+}
+},
+email: "phillip.roberts@example.com",
+login: {
+uuid: "cc665a38-815b-4bf4-ab27-8f79e52e8a15",
+username: "blackkoala563",
+password: "really",
+salt: "GhuTR0p3",
+md5: "c5f263cbb674f875933f697c7992575a",
+sha1: "ce1a0903304ec32a87c218f270e055de11a7944f",
+sha256: "2758f9b207af4ea78877df8720377b006bf2facae7ba0f26db91d5fce948161f"
+},
+dob: {
+date: "1998-09-19T20:50:26.641Z",
+age: 25
+},
+registered: {
+date: "2011-01-21T16:53:27.963Z",
+age: 12
+},
+phone: "071-318-5603",
+cell: "081-457-7850",
+id: {
+name: "PPS",
+value: "1416302T"
+},
+picture: {
+large: "https://randomuser.me/api/portraits/men/60.jpg",
+medium: "https://randomuser.me/api/portraits/med/men/60.jpg",
+thumbnail: "https://randomuser.me/api/portraits/thumb/men/60.jpg"
+},
+nat: "IE"
+}
+],
+info: {
+seed: "5b767e98f3bc0471",
+results: 1,
+page: 1,
+version: "1.4"
+}
+}
+ */

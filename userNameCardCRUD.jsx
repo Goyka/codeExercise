@@ -1,17 +1,5 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import "./styles.css";
-
-/**
- * 1. call api with parameter -> 'results' with value of 10 ( dynamic ) on load of page
- * 2. store results into state
- * 3. display state on to screen
- * 4. make UserCard component displaying [ name, email, picture, location ]
- * 5. display list with .map array method
- * 6. create remove button on card to remove item from list
- * 7. make button to make request to add 10 ( dynamic ) more new randomusers to state
- *
- */
 
 const api = axios.create({
   baseURL: "https://randomuser.me/api",
@@ -20,29 +8,109 @@ const api = axios.create({
   },
 });
 
-const useGetRandomUsers = (count) => {
-  const [users, setUsers] = useState([]);
-  const [showError, setShowError] = useState(false);
-  const [loading, setLoading] = useState(false);
+/**
+ * 요청서
+ * 1. api 요청을 파라미터로 전달하고, results의 수는 페이지 당 10개로 동적으로 할당한다.
+ * 2. results를 state에 저장한다.
+ * 3. state를 UI로 그려낸다.
+ * 4. UserCard 컴포넌트를 생성하여 해당 정보를 보여준다. [ name, email, picture, location ]
+ * 5. 배열 메소드 map을 이용하여 UserCard 리스트를 보여준다.
+ * 6. 카드 삭제 버튼을 구현 한다.
+ * 7. 10개의 UserCard를 더 불러올 수 있도록 하는 버튼을 만든다.
+ */
 
+/** --------------------------------------------------------------------
+ *              UserCard에 api로 받은 users state를 가져와 map              *
+-----------------------------------------------------------------------*/
+export default function App() {
+  const [count, setCount] = useState(10);
+  const { users, getUserInfos, onRemove } = useGetRandomUsers(count);
+
+  useEffect(() => {
+    getUserInfos();
+  }, []);
+
+  return (
+    <>
+      <input value={count} onChange={(e) => setCount(e.target.value)} />
+      <button onClick={getUserInfos}>fetch more</button>
+      {users.length &&
+        users.map((user, index) => {
+          return (
+            <UserCard
+              {...user}
+              // ...user를 prop으로 전달하기 때문에, UserCard에서 데이터를 바로 참조할 수 있다
+              onRemove={() => {
+                onRemove(index);
+              }}
+            />
+          );
+        })}
+    </>
+  );
+}
+/** --------------------------------------------------------------------
+ *                         UserCard 컴포넌트                             *
+-----------------------------------------------------------------------*/
+const UserCard = ({ name, email, picture, location, onRemove }) => {
+  return (
+    <>
+      <div className="user-card-container">
+        <img source={picture} alt="user name" />
+        <p>{name}</p>
+        <p>{email}</p>
+        <p>{location}</p>
+        <button onClick={onRemove}>remove user</button>
+      </div>
+    </>
+  );
+};
+/** --------------------------------------------------------------------
+ *                                                                     *
+-----------------------------------------------------------------------*/
+const useGetRandomUsers = (count) => {
   const getUserInfos = async (count) => {
+    const [users, setUsers] = useState([]);
+    const [showError, setShowError] = useState(false);
+    const [loading, setLoading] = useState(false);
+
+    const onRemove = (index) => {
+      const clone = [...users];
+      clone.splice(index, 1);
+      setUsers(clone);
+    };
+
+    if (loading) {
+      return (
+        <div>
+          <p>loading...</p>
+        </div>
+      );
+    }
+
+    if (showError) {
+      return (
+        <div>
+          <p>error happened ...</p>
+        </div>
+      );
+    }
     setLoading(true);
     const res = await api.get(`/?results=${count}`);
     try {
       if (res.status === 200) {
         const users = res.data.results;
-        setUserInfos([
-          ...userInfos,
-          ...user.map((user) => ({
+        setUsers([
+          ...users,
+          ...users.map((user) => ({
             photo: user.picture.medium,
             name:
               user.name.title + " " + user.name.first + " " + user.name.last,
             email: user.email,
-            location: user.location.country + " ," + user.location.city,
+            location: user.location.country + ", " + user.location.city,
           })),
         ]);
       }
-      throw new Error("something wnet wrong with request ...");
     } catch (error) {
       console.error(error);
       setShowError(true);
@@ -55,69 +123,9 @@ const useGetRandomUsers = (count) => {
   };
 };
 
-export default function App() {
-  // 2.
-  const [count, setCount] = useState(10);
-
-  const { users, showError, loading, getUserInfos } = useGetRandomUsers(count);
-
-  const UserCard = ({ name, email, picture, location, onRemove }) => {
-    return (
-      <>
-        <div className="user-card-container">
-          <img source={picture} alt="user name" />
-          <p>{name}</p>
-          <p>{email}</p>
-          <p>{location}</p>
-          <button onClick={onRemove}>remove user</button>
-        </div>
-      </>
-    );
-  };
-
-  // 1.
-
-  const onRemove = (index) => {
-    const clone = [...userInfos];
-    clone.splice(index, 1);
-    setUserInfos(clone);
-  };
-
-  if (loading) {
-    return (
-      <div>
-        <p>loading...</p>
-      </div>
-    );
-  }
-
-  if (showError) {
-    return (
-      <div>
-        <p>error happened ...</p>
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      <input value={count} onChange={(e) => setCount(e.target.value)} />
-      <button onClick={getUserInfos}>fetch more</button>
-      {users.length &&
-        user.map((user, index) => {
-          return (
-            <UserCard
-              {...user}
-              onRemove={() => {
-                onRemove(index);
-              }}
-            />
-          );
-        })}
-    </div>
-  );
-}
-
+/** --------------------------------------------------------------------
+ *                              api 내용                                *
+-----------------------------------------------------------------------*/
 // https://axios-http.com/docs/res_schema
 // https://randomuser.me/api?results=10
 // https://jsonviewer.stack.hu/

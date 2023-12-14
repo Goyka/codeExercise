@@ -45,7 +45,7 @@ const UserCard = (userData, setCount, deleteUserInfo) => {
 
 const getUsersInfo = async (count) => {
   try {
-    const res = await axios.get("https://randomuser.me/api/?results=${count}");
+    const res = await axios.get(`https://randomuser.me/api/?results=${count}`);
     if (res.status === 200) {
       return res.data.results;
     }

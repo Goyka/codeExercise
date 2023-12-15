@@ -10,7 +10,7 @@ const api = axios.create({
 
 const loginApi = async ({ setIsToken, setErrMessage }) => {
   try {
-    const res = await api.post({
+    const res = await api.post("/login", {
       username,
       password,
     });
@@ -38,7 +38,7 @@ function customHooks02() {
       alert("이미 로그인 된 유저입니다. 메인으로 이동합니다.");
       navigate("/");
     }
-  }, []);
+  }, [isToken]);
 
   const onLoginHandler = async () => {
     setIsLoading(true);
@@ -64,7 +64,7 @@ function customHooks02() {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-      {errMessage && <span>{{ errMessage }}</span>}
+      {errMessage && <span>{errMessage}</span>}
       <button onClick={onLoginHandler}>Login</button>
       {isLoading && <Spinner />}
     </>

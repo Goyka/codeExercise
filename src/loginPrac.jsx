@@ -18,14 +18,14 @@ const loginApi = async ({ setIsToken, setErrMessage, username, password }) => {
       res.cookie("access", accessToken);
       setIsToken((prev) => !prev);
     } else {
-      setErrMessage(res.message);
+      setErrMessage(res.data.message);
     }
   } catch (error) {
     console.error(error);
   }
 };
 
-function customHooks02() {
+function LoginPrac() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -58,7 +58,6 @@ function customHooks02() {
         value={username}
         onChange={(e) => setUsername(e.target.value)}
       />
-
       <input
         type="password"
         value={password}
@@ -71,4 +70,4 @@ function customHooks02() {
   );
 }
 
-export default customHooks02;
+export default LoginPrac;

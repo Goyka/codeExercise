@@ -44,7 +44,7 @@ const useValidation = () => {
       default:
         break;
     }
-    setErrors(newError);
+    setError(newError);
   };
   return { error, onValidate };
 };

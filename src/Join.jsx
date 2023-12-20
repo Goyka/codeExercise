@@ -1,9 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import axios from "axios";
+
+const api = axios.create({
+  baseURL: "https://prac.dev/api",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 const onRegisterUserApi = async (prop) => {
   try {
-    const res = await axios.post(`https://prac.dev/api/${prop}`);
+    const res = await api.post(`/${prop}`);
     if (res.status === 200) {
       alert("회원가입이 완료 되었습니다.");
     }
@@ -12,8 +19,52 @@ const onRegisterUserApi = async (prop) => {
   }
 };
 
+const useValidation = () => {
+  const [error, setError] = useState({});
+  const onValidate = (formData) => {
+    const newError = {};
+    switch (true) {
+      case !formData.username:
+        newError.username = "아이디를 입력해주세요.";
+        break;
+      case !/\S+@\S+\.\S+/.test(formData.email):
+        newError.username =
+          "아이디는 4자리 이상 영문으로, 숫자를 하나 포함합니다.";
+        break;
+      default:
+        break;
+    }
+    switch (true) {
+      case !formData.password:
+        newErrors.password = "비밀번호를 입력해주세요.";
+        break;
+      case formData.password.length < 6:
+        newErrors.password = "비밀번호는 최소 6자 이상이어야 합니다.";
+        break;
+      default:
+        break;
+    }
+    setErrors(newError);
+  };
+  return { error, onValidate };
+};
+
 export const Input = () => {
+  const { error, onValidate } = useValidation();
+  const [formData, setFormData] = useState(initState);
+  const initState = {
+    username: "",
+    password: "",
+    name: "",
+    email: "",
+    phoneNumber: "",
+  };
+
+  const onInputChange = (e) => {
+    setFormData({ ...formData, value: e.target.value });
+  };
   const onSubmit = async () => {
+    onValidate(formData);
     try {
       await onRegisterUserApi("register");
     } catch (err) {
@@ -30,8 +81,8 @@ export const Input = () => {
             <input
               type="text"
               id="username"
-              value={username}
-              onChange={setUsername}
+              value={formData.username}
+              onChange={onInputChange}
             />
             <button onClick={() => setIsUsernameOk(true)}>중복확인</button>
           </>
@@ -41,8 +92,8 @@ export const Input = () => {
             <input
               type="text"
               id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={formData.username}
+              onChange={onInputChange}
             />
             <button>사용가능</button>
           </>
@@ -51,8 +102,8 @@ export const Input = () => {
         <input
           type="password"
           id="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          value={formData.password}
+          onChange={onInputChange}
         />
         <label htmlFor="chkPassword">비밀번호 확인</label>
         <input
@@ -73,18 +124,13 @@ export const Input = () => {
           </>
         )}
         <label htmlFor="name">성명</label>
-        <input
-          type="text"
-          id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+        <input type="text" id="name" value={name} onChange={onInputChange} />
         <label htmlFor="phoneNumber">연락처</label>
         <input
           type="text"
           id="phoneNumber"
-          value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
+          value={formData.phoneNumber}
+          onChange={onInputChange}
         />
         {!isEmailSent ? (
           <>
@@ -92,8 +138,8 @@ export const Input = () => {
             <input
               type="text"
               id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={formData.email}
+              onChange={onInputChange}
             />
             <button onClick={() => setIsEmailSent(true)}>
               이메일 인증 요청
@@ -105,8 +151,8 @@ export const Input = () => {
             <input
               type="text"
               id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={formData.email}
+              onChange={onInputChange}
             />
             <button>인증 요청 발송</button>
             <label htmlFor="code">이메일 인증번호</label>
